@@ -3,8 +3,7 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 from langchain_groq import ChatGroq
 from langchain_core.prompts import PromptTemplate
-# LLMChain is deprecated, so we don't import it anymore.
-# The pipe operator `|` is now used to create chains.
+
 
 # --- Flask App Initialization ---
 app = Flask(__name__)
@@ -12,8 +11,6 @@ CORS(app)
 
 # --- LangChain and AI Model Setup ---
 try:
-    # It's best practice to set your API key as an environment variable
-    # This line will automatically use the GROQ_API_KEY if it's set.
     llm = ChatGroq(model_name="llama3-8b-8192")
     print("✅ Successfully connected to Groq Cloud API.")
 except Exception as e:
@@ -58,9 +55,6 @@ prompt = PromptTemplate(
     template=prompt_template_text
 )
 
-# --- Chain Creation using LCEL ---
-# This is the updated, modern way to create a chain in LangChain.
-# The `|` (pipe) operator connects the components in a sequence.
 if llm:
     chain = prompt | llm
 else:
@@ -83,11 +77,7 @@ def analyze_code():
     code_snippet = data['code']
 
     try:
-        # The invoke method still works the same way.
         result = chain.invoke({"code_snippet": code_snippet})
-
-        # The output from a Chat model in a chain is an AIMessage object.
-        # We access its content with the `.content` attribute.
         explanation = result.content
 
         return jsonify({"explanation": explanation})
